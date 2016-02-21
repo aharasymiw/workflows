@@ -2,6 +2,8 @@ var gulp = require('gulp');
 var gutil = require('gulp-util');
 var coffee = require('gulp-coffee');
 var concat = require('gulp-concat');
+var browserify = require('gulp-browserify');
+
 
 // Instantiate an array variable with source paths, best practice
 // Alternatively 'components/coffee/*.coffee'
@@ -31,7 +33,12 @@ gulp.task('coffee', function() {
 
 // Process js source files, concat them into script.js, place in development
 gulp.task('js', function() {
+  //List the input files
   gulp.src(jsSources)
-    .pipe(concat('scrip.js'))
+    //Concat the files into one script.js file
+    .pipe(concat('script.js'))
+    //Attach dependencies that are required in JS files
+    .pipe(browserify())
+    //Save the output
     .pipe(gulp.dest('builds/development/js'))
 });
