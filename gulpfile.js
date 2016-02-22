@@ -11,12 +11,32 @@ var compass = require('gulp-compass');
 // allows live reload of page
 var connect = require('gulp-connect');
 
+var env;
+var coffeeSources;
+var jsSources;
+var sassSources;
+var htmlSources;
+var jsonSources;
+var outputDir;
+var sassStyle;
+
+// set env to whatever the environment is defined as, or development if undefined
+env = process.env.NODE_ENV || 'development';
+
+if (env === 'development') {
+  outputDir = 'builds/development/';
+  sassStyle = 'expanded';
+} else {
+  outputDir = 'builds/production/';
+  sassStyle = 'compressed';
+}
+
 // Instantiate an array variable with source paths, best practice
 // Alternatively 'components/coffee/*.coffee'
-var coffeeSources = ['components/coffee/tagline.coffee'];
+coffeeSources = ['components/coffee/tagline.coffee'];
 
 // concat source files, listed in order of processing
-var jsSources = [
+jsSources = [
   'components/scripts/rclick.js',
   'components/scripts/pixgrid.js',
   'components/scripts/tagline.js',
@@ -24,11 +44,11 @@ var jsSources = [
 ];
 
 // Only needs one file, since Sass inports it's files itself
-var sassSources =['components/sass/style.scss'];
+sassSources =['components/sass/style.scss'];
 
 // Sources for html files
-var htmlSources = ['builds/development/*.html'];
-var jsonSources = ['builds/development/js/*.json'];
+htmlSources = [outputDir + '*.html'];
+jsonSources = [outputDir + 'js/*.json'];
 
 
 // A gulp task ('name', annonFunc(){})
@@ -54,7 +74,7 @@ gulp.task('js', function() {
     //Attach dependencies that are required in JS files
     .pipe(browserify())
     //Save the output
-    .pipe(gulp.dest('builds/development/js'))
+    .pipe(gulp.dest(outputDir + 'js'))
     //reload the server
     .pipe(connect.reload());
 
@@ -67,12 +87,12 @@ gulp.task('compass', function() {
       // Sass source directory
       sass: 'components/sass',
       // Image source directory
-      image: 'builds/development/images',
+      image: outputDir + 'images',
       // style, 'expanded' for development, 'compressed' for production, can also be nested, compact http://goo.gl/6bCLQo
-      style: 'expanded'
+      style: sassStyle
     })
       .on('error', gutil.log))
-    .pipe(gulp.dest('builds/development/css'))
+    .pipe(gulp.dest(outputDir + 'css'))
     .pipe(connect.reload());
 });
 
@@ -88,7 +108,7 @@ gulp.task('watch', function() {
 gulp.task('connect', function() {
   connect.server({
     //location of application to server
-    root: 'builds/development',
+    root: outputDir,
     livereload: true
   });
 });
