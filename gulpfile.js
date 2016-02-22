@@ -1,10 +1,15 @@
 var gulp = require('gulp');
+// Allows file system interactions, etc
 var gutil = require('gulp-util');
 var coffee = require('gulp-coffee');
+// compiles all files into one file
 var concat = require('gulp-concat');
+// allows requireing of dependancies in js files
 var browserify = require('gulp-browserify');
+// Allows compliation of scss files to css
 var compass = require('gulp-compass');
-
+// allows live reload of page
+var connect = require('gulp-connect');
 
 // Instantiate an array variable with source paths, best practice
 // Alternatively 'components/coffee/*.coffee'
@@ -44,7 +49,10 @@ gulp.task('js', function() {
     //Attach dependencies that are required in JS files
     .pipe(browserify())
     //Save the output
-    .pipe(gulp.dest('builds/development/js'));
+    .pipe(gulp.dest('builds/development/js'))
+    //reload the server
+    .pipe(connect.reload());
+
 });
 
 gulp.task('compass', function(){
@@ -59,7 +67,8 @@ gulp.task('compass', function(){
       style: 'expanded'
     })
       .on('error', gutil.log))
-    .pipe(gulp.dest('builds/development/css'));
+    .pipe(gulp.dest('builds/development/css'))
+    .pipe(connect.reload());
 });
 
 gulp.task('watch', function() {
@@ -69,4 +78,12 @@ gulp.task('watch', function() {
   gulp.watch('components/sass/*.scss', ['compass']);
 });
 
-gulp.task('default', ['coffee', 'js', 'compass', 'watch']);
+gulp.task('connect', function(){
+  connect.server({
+    //location of application to server
+    root: 'builds/development',
+    livereload: true
+  });
+});
+
+gulp.task('default', ['coffee', 'js', 'compass', 'connect', 'watch']);
