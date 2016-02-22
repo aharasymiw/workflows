@@ -10,6 +10,10 @@ var browserify = require('gulp-browserify');
 var compass = require('gulp-compass');
 // allows live reload of page
 var connect = require('gulp-connect');
+// allows conditional statments in pipes
+var gulpif = require('gulp-if');
+// allows uglifying js
+var uglify = require('gulp-uglify');
 
 var env;
 var coffeeSources;
@@ -73,6 +77,8 @@ gulp.task('js', function() {
     .pipe(concat('script.js'))
     //Attach dependencies that are required in JS files
     .pipe(browserify())
+    //conditionally uglify, only if in production environment
+    .pipe(gulpif(env ==='production', uglify()))
     //Save the output
     .pipe(gulp.dest(outputDir + 'js'))
     //reload the server
