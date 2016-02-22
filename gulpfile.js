@@ -26,6 +26,11 @@ var jsSources = [
 // Only needs one file, since Sass inports it's files itself
 var sassSources =['components/sass/style.scss'];
 
+// Sources for html files
+var htmlSources = ['builds/development/*.html'];
+var jsonSources = ['builds/development/js/*.json'];
+
+
 // A gulp task ('name', annonFunc(){})
 // 'gulp coffee' runs it in term, ie 'gulp "taskName"'
 gulp.task('coffee', function() {
@@ -55,7 +60,7 @@ gulp.task('js', function() {
 
 });
 
-gulp.task('compass', function(){
+gulp.task('compass', function() {
   gulp.src(sassSources)
     //Compass can take a config object, as opposed to using a config.rb file for sass
     .pipe(compass({
@@ -76,9 +81,11 @@ gulp.task('watch', function() {
   gulp.watch(coffeeSources, ['coffee']);
   gulp.watch(jsSources, ['js']);
   gulp.watch('components/sass/*.scss', ['compass']);
+  gulp.watch(htmlSources, ['html']);
+  gulp.watch(jsonSources, ['json']);
 });
 
-gulp.task('connect', function(){
+gulp.task('connect', function() {
   connect.server({
     //location of application to server
     root: 'builds/development',
@@ -86,4 +93,15 @@ gulp.task('connect', function(){
   });
 });
 
-gulp.task('default', ['coffee', 'js', 'compass', 'connect', 'watch']);
+gulp.task('html', function() {
+  gulp.src(htmlSources)
+  .pipe(connect.reload());
+});
+
+gulp.task('json', function() {
+  gulp.src(jsonSources)
+  .pipe(connect.reload());
+});
+
+
+gulp.task('default', ['json', 'html', 'coffee', 'js', 'compass', 'connect', 'watch']);
